@@ -60,7 +60,7 @@
                     <columns>
                         <TableColumn fx:id="timeTableView" editable="false" prefWidth="66.0" sortable="false" text="Time" />
                       <TableColumn fx:id="userTableView" editable="false" prefWidth="94.0" sortable="false" text="User" />
-                      <TableColumn fx:id="messageTableView" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="279.0" sortable="false" text="Message" />
+                      <TableColumn fx:id="messageTableView" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="185.0" sortable="false" text="Message" />
                     </columns>
                   </TableView>
                </center>

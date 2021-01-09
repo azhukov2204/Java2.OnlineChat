@@ -6,6 +6,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class MainWindowController {
 
@@ -21,6 +24,9 @@ public class MainWindowController {
     @FXML
     private  TableColumn<RowChatMessage, String> messageTableView;
 
+    @FXML
+    private TableColumn<RowChatMessage, String> timeTableView;
+
 
     @FXML
     private Button sendMessageButton;
@@ -35,7 +41,9 @@ public class MainWindowController {
     void initialize() {
         userTableView.setCellValueFactory(new PropertyValueFactory<>("User"));
         messageTableView.setCellValueFactory(new PropertyValueFactory<>("Message"));
-        //chatMessages.setItems(FXCollections.observableArrayList());
+        timeTableView.setCellValueFactory(new PropertyValueFactory<>("Time"));
+
+        messageTableView.setPrefWidth(500);
 
 
         ObservableList<String> chatUsers = FXCollections.observableArrayList("Иванов Иван", "Петров Петр", "Федор Михайлович");
@@ -47,16 +55,24 @@ public class MainWindowController {
     @FXML
     void sendMessage() {
         sendMessageText.requestFocus(); //при вызове метода фокус сразу возвращается на sendMessageText
+
+        Date date = new Date(); //текущая дата и время
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+        String currentTime = dateFormat.format(date).toString();
+
         String message=sendMessageText.getText().trim();
 
         if (!message.isBlank()) {
-            chatMessages.getItems().add(new RowChatMessage(currentUser, message));
+            chatMessages.getItems().add(new RowChatMessage(currentTime, currentUser, message));
             sendMessageText.clear();
         }
 
         int messagesCount = chatMessages.getItems().size();
         chatMessages.scrollTo(messagesCount -1 ); //прокрутим к последнему сообшению
         sendMessageButton.setDisable(true); //после отправки сделаем кнопку неактивной*/
+
+
+
     }
 
 
@@ -79,6 +95,13 @@ public class MainWindowController {
         about.setHeaderText("Online - чат");
         about.setContentText("Курс Java Core. Продвинутый уровень.");
         about.show();
+    }
+
+
+    @FXML
+    void resize() {
+        System.out.println("resize");
+
     }
 
 }
