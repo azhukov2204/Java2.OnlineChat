@@ -43,11 +43,10 @@ public class MainWindowController {
         messageTableView.setCellValueFactory(new PropertyValueFactory<>("Message"));
         timeTableView.setCellValueFactory(new PropertyValueFactory<>("Time"));
 
-        messageTableView.setPrefWidth(500);
 
-
-        ObservableList<String> chatUsers = FXCollections.observableArrayList("Иванов Иван", "Петров Петр", "Федор Михайлович");
+        ObservableList<String> chatUsers = FXCollections.observableArrayList("Петров Петр", "Федор Михайлович");
         chatUsersList.setItems(chatUsers); //добавим несколько записей в поле с текущими активными пользователями чата, для теста
+        chatUsersList.getItems().add(currentUser); //Добавляем текущего пользователя. Пока только для теста
 
     }
 
@@ -57,21 +56,19 @@ public class MainWindowController {
         sendMessageText.requestFocus(); //при вызове метода фокус сразу возвращается на sendMessageText
 
         Date date = new Date(); //текущая дата и время
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-        String currentTime = dateFormat.format(date).toString();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        String currentTime = dateFormat.format(date); //Преобразуем время в нужный формат
 
-        String message=sendMessageText.getText().trim();
+        String message=sendMessageText.getText().trim(); //введенное сообщение
 
-        if (!message.isBlank()) {
+        if (!message.isBlank()) { //если что-то введено, то добавляем сообщение
             chatMessages.getItems().add(new RowChatMessage(currentTime, currentUser, message));
             sendMessageText.clear();
         }
 
         int messagesCount = chatMessages.getItems().size();
         chatMessages.scrollTo(messagesCount -1 ); //прокрутим к последнему сообшению
-        sendMessageButton.setDisable(true); //после отправки сделаем кнопку неактивной*/
-
-
+        sendMessageButton.setDisable(true); //после отправки сделаем кнопку неактивной
 
     }
 
@@ -79,7 +76,7 @@ public class MainWindowController {
     @FXML
     void setActiveSendButton() { //метод вызывается при вводе текста
         if (!sendMessageText.getText().trim().isBlank()) {
-            sendMessageButton.setDisable(false);
+            sendMessageButton.setDisable(false); //если что-то введено, то кнопку делаем активной
         }
     }
 
@@ -97,11 +94,5 @@ public class MainWindowController {
         about.show();
     }
 
-
-    @FXML
-    void resize() {
-        System.out.println("resize");
-
-    }
 
 }
