@@ -7,6 +7,8 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
@@ -33,9 +35,6 @@
          <items>
             <ListView fx:id="chatUsersList" focusTraversable="false" maxWidth="300.0" minWidth="50.0" />
             <BorderPane prefHeight="200.0" prefWidth="200.0">
-               <center>
-                  <ListView fx:id="chatMessages" focusTraversable="false" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-               </center>
                <bottom>
                   <BorderPane prefHeight="50.0" prefWidth="296.0" BorderPane.alignment="CENTER">
                      <right>
@@ -56,6 +55,15 @@
                      </center>
                   </BorderPane>
                </bottom>
+               <center>
+                  <TableView fx:id="chatMessages" focusTraversable="false" BorderPane.alignment="CENTER">
+                    <columns>
+                        <TableColumn fx:id="timeTableView" editable="false" prefWidth="66.0" sortable="false" text="Time" />
+                      <TableColumn fx:id="userTableView" editable="false" prefWidth="94.0" sortable="false" text="User" />
+                      <TableColumn fx:id="messageTableView" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="279.0" sortable="false" text="Message" />
+                    </columns>
+                  </TableView>
+               </center>
             </BorderPane>
          </items>
       </SplitPane>
