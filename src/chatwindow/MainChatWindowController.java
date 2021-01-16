@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,7 +23,7 @@ public class MainChatWindowController {
     private TableColumn<RowChatMessage, String> userTableField;
 
     @FXML
-    private  TableColumn<RowChatMessage, String> messageTableField;
+    private TableColumn<RowChatMessage, String> messageTableField;
 
     @FXML
     private TableColumn<RowChatMessage, String> timeTableField;
@@ -40,8 +41,18 @@ public class MainChatWindowController {
     @FXML
     void initialize() {
         userTableField.setCellValueFactory(new PropertyValueFactory<>("user"));
-        messageTableField.setCellValueFactory(new PropertyValueFactory<>("message"));
         timeTableField.setCellValueFactory(new PropertyValueFactory<>("time"));
+        messageTableField.setCellValueFactory(new PropertyValueFactory<>("message"));
+        //Делаем перенос текста по ширине колонки:
+        messageTableField.setCellFactory(rowChatMessageStringTableColumn -> {
+            TableCell<RowChatMessage, String> cell = new TableCell<>();
+            Text text = new Text();
+            cell.setGraphic(text);
+            cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
+            text.textProperty().bind(cell.itemProperty());
+            text.wrappingWidthProperty().bind(cell.widthProperty());
+            return cell;
+        });
 
         ObservableList<String> chatUsers = FXCollections.observableArrayList("Петров Петр", "Федор Михайлович");
         chatUsersList.setItems(chatUsers); //добавим несколько записей в поле с активными пользователями чата, для теста
