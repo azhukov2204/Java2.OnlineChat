@@ -1,4 +1,4 @@
-package chatwindow;
+package client;
 
 import javafx.beans.property.SimpleStringProperty;
 
