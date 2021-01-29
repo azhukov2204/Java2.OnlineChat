@@ -1,7 +1,7 @@
 package client.controllers;
 
+import client.controllers.types.RowChatMessage;
 import client.models.Network;
-import client.models.RowChatMessage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -70,13 +70,10 @@ public class MainChatWindowController {
     }
 
 
-    //todo переименовать метод:
     @FXML
     void sendMessage() {
         sendMessageText.requestFocus(); //при вызове метода фокус сразу возвращается на sendMessageText
-
         String message=sendMessageText.getText().trim(); //введенное сообщение
-
         if (!message.isBlank()) { //если что-то введено, то добавляем сообщение
             try {
                 network.sendMessage(message, "Петров петя", this);
