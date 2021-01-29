@@ -1,4 +1,4 @@
-package client;
+package client.models;
 
 import javafx.beans.property.SimpleStringProperty;
 
