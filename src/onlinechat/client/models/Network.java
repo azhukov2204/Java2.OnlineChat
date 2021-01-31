@@ -1,6 +1,6 @@
-package client.models;
+package onlinechat.client.models;
 
-import client.controllers.MainChatWindowController;
+import onlinechat.client.controllers.MainChatWindowController;
 import javafx.application.Platform;
 
 import java.io.DataInputStream;

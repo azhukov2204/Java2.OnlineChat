@@ -1,7 +1,7 @@
-package client.controllers;
+package onlinechat.client.controllers;
 
-import client.controllers.types.RowChatMessage;
-import client.models.Network;
+import onlinechat.client.controllers.types.RowChatMessage;
+import onlinechat.client.models.Network;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

@@ -5,10 +5,10 @@ import java.util.List;
 public class BaseAuthService implements AuthService {
 
     //этот тип используется только тут, сделаем класс вложенным
-    public class User {
-        private String login;
-        private String password;
-        private String nickName;
+    private static class User {
+        private final String login;
+        private final String password;
+        private final String nickName;
 
         public User(String login, String password, String nickName) {
             this.login = login;
@@ -42,16 +42,21 @@ public class BaseAuthService implements AuthService {
 
     @Override
     public String getNickNameByLoginAndPassword(String login, String password) {
+        for (User user : users) {
+            if (user.getLogin().equals(login) && user.getPassword().equals(password)) {
+                return user.getNickName();
+            }
+        }
         return null;
     }
 
     @Override
     public void startAuthentication() {
-
+        System.out.println("Сервис аутентификации запущен");
     }
 
     @Override
     public void endAuthentication() {
-
+        System.out.println("Сервис аутентификации остановлен");
     }
 }
