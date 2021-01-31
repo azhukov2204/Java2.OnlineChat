@@ -1,6 +1,6 @@
-package server;
+package onlinechat.serversingleuser;
 
-import server.Transceiver;
+import onlinechat.serversingleuser.transceiver.Transceiver;
 
 import java.io.IOException;
 import java.net.ServerSocket;

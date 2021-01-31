@@ -1,7 +1,7 @@
-package client;
+package onlinechat.client;
 
-import client.controllers.MainChatWindowController;
-import client.models.Network;
+import onlinechat.client.controllers.MainChatWindowController;
+import onlinechat.client.models.Network;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

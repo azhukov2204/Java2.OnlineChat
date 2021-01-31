@@ -1,4 +1,4 @@
-package server;
+package onlinechat.serversingleuser.transceiver;
 
 import java.io.*;
 import java.net.Socket;
