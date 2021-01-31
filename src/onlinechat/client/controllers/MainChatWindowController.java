@@ -76,7 +76,7 @@ public class MainChatWindowController {
         String message=sendMessageText.getText().trim(); //введенное сообщение
         if (!message.isBlank()) { //если что-то введено, то добавляем сообщение
             try {
-                network.sendMessage(message, "Петров петя", this);
+                network.sendMessage(message, "Я", this);
             } catch (IOException e) {
                 e.printStackTrace();
             }

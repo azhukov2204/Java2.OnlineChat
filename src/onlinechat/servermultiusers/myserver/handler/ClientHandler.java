@@ -22,8 +22,9 @@ public class ClientHandler {
     private static final String AUTHERR_CMD_PREFIX = "/autherr"; // + error message
     private static final String CLIENT_MSG_CMD_PREFIX = "/clientMsg"; // + msg
     private static final String SERVER_MSG_CMD_PREFIX = "/serverMsg"; // + msg
-    private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + p + msg
+    private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + msg
     private static final String END_CMD_PREFIX = "/end"; //
+    //private static final String ANY_ERROR_PREFIX = "/error"; //
 
 
     public ClientHandler(MyServer myServer, Socket clientSocket, BaseAuthService baseAuthService) {
@@ -43,8 +44,8 @@ public class ClientHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                myServer.unsubscribeClient(this);
                 try {
+                    myServer.unsubscribeClient(this);
                     clientSocket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -102,9 +103,17 @@ public class ClientHandler {
                     case END_CMD_PREFIX:
                         return;
                     case PRIVATE_MSG_CMD_PREFIX:
+                        String[] partsOfPrivateMessages = message.split("\\s+", 3);
+                        if (partsOfPrivateMessages.length!=3) {
+                            sendMessage(null," Ошибка отправки приватного сообщения");
+                        } else {
+                            if (!myServer.privateMessage(nickName, partsOfPrivateMessages[1], partsOfPrivateMessages[2])) {
+                                sendMessage(null," Ошибка отправки приватного сообщения, получатель не подключен");
+                            }
+                        }
                         break;
                     default:
-                        myServer.broadcastMessage(this, message);
+                        myServer.broadcastMessage(nickName, message);
                         break;
                 }
             }
@@ -112,7 +121,11 @@ public class ClientHandler {
     }
 
     public void sendMessage(String senderNickName, String message) throws IOException {
-        out.writeUTF(String.format("%s %s %s", CLIENT_MSG_CMD_PREFIX, senderNickName, message));
+        if (senderNickName!=null) {
+            out.writeUTF(String.format("%s %s %s", CLIENT_MSG_CMD_PREFIX, senderNickName, message));
+        } else {
+            out.writeUTF(String.format("%s %s", SERVER_MSG_CMD_PREFIX, message)); //если отправитель пустой, значит это серверное сообщение
+        }
     }
 
     public String getNickName() {

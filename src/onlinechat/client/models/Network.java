@@ -57,7 +57,7 @@ public class Network {
             while (isConnected) {
                 try {
                     String inputMessage = in.readUTF();
-                    Platform.runLater(() -> chatWindowController.addMessage(inputMessage, "Петров Петя"));
+                    Platform.runLater(() -> chatWindowController.addMessage(inputMessage, "Имя отправителя"));
                     System.out.println(inputMessage);
                 } catch (IOException e) {
                     e.printStackTrace();
