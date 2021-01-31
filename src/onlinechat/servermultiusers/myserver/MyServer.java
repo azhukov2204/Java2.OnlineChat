@@ -89,8 +89,6 @@ public class MyServer {
         broadcastMessage(null, message);
     }
 
-
-
     public synchronized boolean privateMessage(String senderNickName, String recipientNickName, String message) throws IOException {
         for (ClientHandler activeClient : activeClients) {
             if (activeClient.getNickName().equals(recipientNickName)) {

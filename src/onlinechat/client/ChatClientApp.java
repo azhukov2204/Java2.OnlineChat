@@ -8,12 +8,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class SimpleChatClient extends Application {
+public class ChatClientApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(SimpleChatClient.class.getResource("views/MainChatWindow.fxml"));
+        loader.setLocation(ChatClientApp.class.getResource("views/MainChatWindow.fxml"));
 
         Parent root = loader.load();
         primaryStage.setTitle("Online Chat");

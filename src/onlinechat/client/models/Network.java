@@ -63,7 +63,7 @@ public class Network {
                     e.printStackTrace();
                     isConnected = false;
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(1000); //задержка перед попыткой реконнекта
                     } catch (InterruptedException interruptedException) {
                         interruptedException.printStackTrace();
                     }
