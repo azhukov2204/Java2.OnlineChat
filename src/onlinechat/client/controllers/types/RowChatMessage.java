@@ -1,4 +1,4 @@
-package chatwindow;
+package onlinechat.client.controllers.types;
 
 import javafx.beans.property.SimpleStringProperty;
 

@@ -1,5 +1,7 @@
-package chatwindow;
+package onlinechat.client.controllers;
 
+import onlinechat.client.controllers.types.RowChatMessage;
+import onlinechat.client.models.Network;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -7,11 +9,18 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
 public class MainChatWindowController {
+
+    private Network network;
+
+    public void setNetwork(Network network) {
+        this.network = network;
+    }
 
     @FXML
     private ListView<String> chatUsersList;
@@ -64,19 +73,25 @@ public class MainChatWindowController {
     @FXML
     void sendMessage() {
         sendMessageText.requestFocus(); //при вызове метода фокус сразу возвращается на sendMessageText
-
         String message=sendMessageText.getText().trim(); //введенное сообщение
-
         if (!message.isBlank()) { //если что-то введено, то добавляем сообщение
+            try {
+                network.sendMessage(message, "Я", this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            sendMessageText.clear();
+            sendMessageButton.setDisable(true); //после отправки сделаем кнопку неактивной. Кнопка станет активной, если что-то введено
+        }
+    }
+
+    public void addMessage(String message, String nickName) {
             Date date = new Date(); //текущая дата и время
             SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
             String currentTime = timeFormat.format(date); //Преобразуем время в нужный формат
-            chatMessagesTable.getItems().add(new RowChatMessage(currentTime, currentUser, message));
-            sendMessageText.clear();
-            sendMessageButton.setDisable(true); //после отправки сделаем кнопку неактивной. Кнопка станет активной, если что-то введено
+            chatMessagesTable.getItems().add(new RowChatMessage(currentTime, nickName, message));
             int messagesCount = chatMessagesTable.getItems().size();
             chatMessagesTable.scrollTo(messagesCount -1 ); //прокрутим к последнему сообшению
-        }
     }
 
 
