@@ -34,7 +34,7 @@ public class MyServer {
             System.out.println("Ошибка при подключении клиента");
             e.printStackTrace();
         } finally {
-            if (baseAuthService!=null) {
+            if (baseAuthService != null) {
                 baseAuthService.endAuthentication();
             }
             System.out.println("Сервер остановлен");
@@ -92,7 +92,7 @@ public class MyServer {
     public synchronized boolean privateMessage(String senderNickName, String recipientNickName, String message) throws IOException {
         for (ClientHandler activeClient : activeClients) {
             if (activeClient.getNickName().equals(recipientNickName)) {
-                activeClient.sendMessage(senderNickName, message);
+                activeClient.sendMessage(senderNickName, "Приватное сообщение: " + message);
                 return true;
             }
         }
