@@ -1,5 +1,8 @@
 package onlinechat.client.models;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import onlinechat.client.ChatClientApp;
 import onlinechat.client.controllers.MainChatWindowController;
 import javafx.application.Platform;
 
@@ -7,6 +10,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Optional;
 
 public class Network {
 
@@ -29,8 +33,13 @@ public class Network {
     private DataOutputStream out = null;
 
     private String nickName;
+    private ChatClientApp chatClientApp;
 
     private boolean isConnected = false;
+
+    public void setChatClientApp(ChatClientApp chatClientApp) {
+        this.chatClientApp = chatClientApp;
+    }
 
     public Network() {
         serverHost = DEFAULT_SERVER_HOST;
@@ -54,16 +63,25 @@ public class Network {
             isConnected = true;
             System.out.println("Соединение установлено");
         } catch (IOException e) {
-            System.out.println("Не удалось установить соединение");
             e.printStackTrace();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Не удалось установить соединение");
+            alert.setHeaderText("Не удалось установить соединение");
+            alert.setContentText("Повторить попытку подключения?");
+            ButtonType yesButton = new ButtonType("Да");
+            ButtonType noButton = new ButtonType("Нет, выйти");
+            alert.getButtonTypes().clear();
+            alert.getButtonTypes().addAll(yesButton, noButton);
+
+            Optional<ButtonType> option = alert.showAndWait();
+            if (option.get() == yesButton) {
+                connection();
+            } else {
+                System.exit(-1);
             }
-            System.out.println("Пробуем подключиться еще раз");
-            connection();
+
         }
+
     }
 
     public void startReceiver(MainChatWindowController chatWindowController) {
@@ -84,23 +102,28 @@ public class Network {
                             default:
                                 Platform.runLater(() -> System.out.println("!!Неизвестная ошибка сервера"));
                                 break;
-
                         }
                     }
-
-
                 } catch (IOException e) {
                     e.printStackTrace();
                     isConnected = false;
-                    try {
-                        Thread.sleep(1000); //задержка перед попыткой реконнекта
-                    } catch (InterruptedException interruptedException) {
-                        interruptedException.printStackTrace();
-                    }
-                    System.out.println("Соединение прервано. Пробуем подключиться еще раз");
-                    connection();
+                    System.out.println("Соединение прервано");
+                    //todo тут сделать вызов аутентификации и алерт:
+                    Platform.runLater(() -> {
+                        try {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Ошибка");
+                            alert.setContentText("Отпало подключение");
+                            alert.showAndWait();
+                            chatClientApp.createAndStartAuthWindow();
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
+                        }
+                    });
+
                 }
             }
+            System.out.println("Receiver остановлен");
         });
         receiver.setDaemon(true);
         receiver.start();
@@ -108,10 +131,10 @@ public class Network {
     }
 
 
-    public void sendMessage(String message, String currentUser, MainChatWindowController mainChatWindowController) throws IOException {
+    public void sendMessage(String message, MainChatWindowController mainChatWindowController) throws IOException {
         if (clientSocket.isConnected() && isConnected) {
             out.writeUTF(message);
-            mainChatWindowController.addMessage(message, currentUser);
+            mainChatWindowController.addMessage(message, "Я");
         }
     }
 

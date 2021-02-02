@@ -14,13 +14,10 @@ import onlinechat.client.models.Network;
 public class AuthWindowController {
 
     private Network network;
-
     private ChatClientApp chatClientApp;
-
     public void setNetwork(Network network) {
         this.network = network;
     }
-
     public void setChatClientApp(ChatClientApp chatClientApp) {
         this.chatClientApp = chatClientApp;
     }
@@ -66,7 +63,6 @@ public class AuthWindowController {
         } else {
             System.out.println("Ошибка аутентификации " + authErrorMessage);
         }
-
 
     }
 

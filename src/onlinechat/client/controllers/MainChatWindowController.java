@@ -1,5 +1,6 @@
 package onlinechat.client.controllers;
 
+import onlinechat.client.ChatClientApp;
 import onlinechat.client.controllers.types.RowChatMessage;
 import onlinechat.client.models.Network;
 import javafx.collections.FXCollections;
@@ -73,10 +74,10 @@ public class MainChatWindowController {
     @FXML
     void sendMessage() {
         sendMessageText.requestFocus(); //при вызове метода фокус сразу возвращается на sendMessageText
-        String message=sendMessageText.getText().trim(); //введенное сообщение
+        String message = sendMessageText.getText().trim(); //введенное сообщение
         if (!message.isBlank()) { //если что-то введено, то добавляем сообщение
             try {
-                network.sendMessage(message, "Я", this);
+                network.sendMessage(message, this);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -86,12 +87,12 @@ public class MainChatWindowController {
     }
 
     public void addMessage(String message, String nickName) {
-            Date date = new Date(); //текущая дата и время
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-            String currentTime = timeFormat.format(date); //Преобразуем время в нужный формат
-            chatMessagesTable.getItems().add(new RowChatMessage(currentTime, nickName, message));
-            int messagesCount = chatMessagesTable.getItems().size();
-            chatMessagesTable.scrollTo(messagesCount -1 ); //прокрутим к последнему сообшению
+        Date date = new Date(); //текущая дата и время
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        String currentTime = timeFormat.format(date); //Преобразуем время в нужный формат
+        chatMessagesTable.getItems().add(new RowChatMessage(currentTime, nickName, message));
+        int messagesCount = chatMessagesTable.getItems().size();
+        chatMessagesTable.scrollTo(messagesCount - 1); //прокрутим к последнему сообшению
     }
 
 
