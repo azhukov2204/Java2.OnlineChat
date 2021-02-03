@@ -93,7 +93,7 @@ public class ClientHandler {
                 out.writeUTF(AUTHERR_CMD_PREFIX + ";Пользователь с таким логином уже авторизован");
                 return false;
             }
-            out.writeUTF(AUTHOK_CMD_PREFIX + ";" + nickName + " успешно авторизован");
+            out.writeUTF(AUTHOK_CMD_PREFIX + ";" + nickName + ";успешно авторизован");
             return true;
         } else {
             out.writeUTF(AUTHERR_CMD_PREFIX + ";Введены неверные логин или пароль");

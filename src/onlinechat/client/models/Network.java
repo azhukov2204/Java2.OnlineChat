@@ -139,6 +139,13 @@ public class Network {
         }
     }
 
+    public void sendPrivateMessage(String recipientNickName, String message) throws IOException {
+        if (clientSocket.isConnected() && isConnected) {
+            out.writeUTF(String.format("%s;%s;%s", PRIVATE_MSG_CMD_PREFIX, recipientNickName, message));
+            mainChatWindowController.addMessage(message, "Я");
+        }
+    }
+
     public String sendAuthCommand(String login, String password) throws IOException {
         out.writeUTF(String.format("%s;%s;%s", AUTH_CMD_PREFIX, login, password));
         String response = in.readUTF();

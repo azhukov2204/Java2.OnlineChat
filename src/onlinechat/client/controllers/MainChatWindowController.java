@@ -20,7 +20,10 @@ public class MainChatWindowController {
 
     private Network network;
 
-    private String selectedRecipient;
+    private String selectedNickName = "";
+
+    @FXML
+    private Label selectedNickNameLabel;
 
     public void setNetwork(Network network) {
         this.network = network;
@@ -81,18 +84,18 @@ public class MainChatWindowController {
                     int index = cell.getIndex();
                     if (selectionModel.getSelectedIndices().contains(index)) {
                         selectionModel.clearSelection(index);
-                        selectedRecipient = null;
+                        selectedNickName = "";
+                        selectedNickNameLabel.setText("Сообщение для всех пользователей чата: ");
                     } else {
                         selectionModel.select(index);
-                        selectedRecipient = cell.getItem();
+                        selectedNickName = cell.getItem();
+                        selectedNickNameLabel.setText("Приватное сообщение для " + selectedNickName + ":");
                     }
                     event.consume();
                 }
             });
             return cell;
         });
-
-
     }
 
 
@@ -102,7 +105,11 @@ public class MainChatWindowController {
         String message = sendMessageText.getText().trim(); //введенное сообщение
         if (!message.isBlank()) { //если что-то введено, то добавляем сообщение
             try {
-                network.sendMessage(message, this);
+                if (selectedNickName.isBlank()) {
+                    network.sendMessage(message, this);
+                } else {
+                    network.sendPrivateMessage(selectedNickName, message);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
