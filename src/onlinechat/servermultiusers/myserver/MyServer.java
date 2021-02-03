@@ -39,7 +39,6 @@ public class MyServer {
             }
             System.out.println("Сервер остановлен");
         }
-
     }
 
     public synchronized boolean isNickNameBusy(String nickName) {

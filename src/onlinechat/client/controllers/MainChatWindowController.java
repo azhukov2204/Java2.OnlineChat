@@ -1,6 +1,6 @@
 package onlinechat.client.controllers;
 
-import onlinechat.client.ChatClientApp;
+import javafx.scene.input.MouseEvent;
 import onlinechat.client.controllers.types.RowChatMessage;
 import onlinechat.client.models.Network;
 import javafx.collections.FXCollections;
@@ -13,11 +13,14 @@ import javafx.scene.text.Text;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 public class MainChatWindowController {
 
     private Network network;
+
+    private String selectedRecipient;
 
     public void setNetwork(Network network) {
         this.network = network;
@@ -64,9 +67,31 @@ public class MainChatWindowController {
             return cell;
         });
 
-        ObservableList<String> chatUsers = FXCollections.observableArrayList("Петров Петр", "Федор Михайлович");
-        chatUsersList.setItems(chatUsers); //добавим несколько записей в поле с активными пользователями чата, для теста
-        chatUsersList.getItems().add(currentUser); //Добавляем "текущего" пользователя. Пока только для теста
+        //ObservableList<String> chatUsers = FXCollections.observableArrayList("Петров Петр", "Федор Михайлович");
+        //chatUsersList.setItems(chatUsers); //добавим несколько записей в поле с активными пользователями чата, для теста
+        //chatUsersList.getItems().add(currentUser); //Добавляем "текущего" пользователя. Пока только для теста
+        chatUsersList.setItems(FXCollections.observableArrayList(List.of("Мартин_Некотов", "Борис_Николаевич", "Гендальф_Серый")));
+        chatUsersList.setCellFactory(lv -> {
+            MultipleSelectionModel<String> selectionModel = chatUsersList.getSelectionModel();
+            ListCell<String> cell = new ListCell<>();
+            cell.textProperty().bind(cell.itemProperty());
+            cell.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                chatUsersList.requestFocus();
+                if (!cell.isEmpty()) {
+                    int index = cell.getIndex();
+                    if (selectionModel.getSelectedIndices().contains(index)) {
+                        selectionModel.clearSelection(index);
+                        selectedRecipient = null;
+                    } else {
+                        selectionModel.select(index);
+                        selectedRecipient = cell.getItem();
+                    }
+                    event.consume();
+                }
+            });
+            return cell;
+        });
+
 
     }
 
