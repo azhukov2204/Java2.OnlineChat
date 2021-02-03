@@ -1,5 +1,7 @@
 package onlinechat.client.controllers;
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -16,9 +18,11 @@ public class AuthWindowController {
 
     private Network network;
     private ChatClientApp chatClientApp;
+
     public void setNetwork(Network network) {
         this.network = network;
     }
+
     public void setChatClientApp(ChatClientApp chatClientApp) {
         this.chatClientApp = chatClientApp;
     }
@@ -57,19 +61,33 @@ public class AuthWindowController {
             return;
         }
 
-        String authErrorMessage = network.sendAuthCommand(login, password);
+        String authErrorMessage;
+        try {
+            authErrorMessage = network.sendAuthCommand(login, password);
+        } catch (SocketException e) {
+            e.printStackTrace();
+            authErrorMessage = "SocketException";
+        } catch (IOException e) {
+            e.printStackTrace();
+            authErrorMessage = e.getMessage();
+        }
 
         if (authErrorMessage == null) {
             chatClientApp.startChat();
-        } else {
-            System.out.println("Ошибка аутентификации " + authErrorMessage);
+        } else if (authErrorMessage.equals("SocketException")) {
+            if (Network.runAlert("Повторить попытку подключения?").get() == Network.yesButton) {
+                network.connection();
+            } else {
+                System.exit(-1);
+            }
+        }
+        else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Ошибка аутентификации");
             alert.setHeaderText("Ошибка аутентификации");
             alert.setContentText(authErrorMessage);
             alert.show();
         }
-
     }
 
 }

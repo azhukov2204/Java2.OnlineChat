@@ -17,6 +17,8 @@ public class ClientHandler {
 
     private String nickName;
 
+    private static final int SOCKET_TIMEOUT_MS=120000;
+
     private static final String AUTH_CMD_PREFIX = "/auth"; // + login + pass
     private static final String AUTHOK_CMD_PREFIX = "/authok"; // + username
     private static final String AUTHERR_CMD_PREFIX = "/autherr"; // + error message
@@ -58,6 +60,9 @@ public class ClientHandler {
 
     private void authenticationAndSubscribe() throws IOException {
         String message;
+        System.out.println("Устанавливаем тайм-аут сокета");
+        clientSocket.setSoTimeout(SOCKET_TIMEOUT_MS);
+
         boolean isAuthenticationSuccessful = false;
         do {
             message = in.readUTF();
@@ -67,6 +72,8 @@ public class ClientHandler {
                 out.writeUTF(AUTHERR_CMD_PREFIX + ";Ошибка авторизации");
             }
         } while (!isAuthenticationSuccessful);
+
+        clientSocket.setSoTimeout(0);   //после прохождения аутентификации снимаем ограничение по тайм-ауту
         myServer.subscribeClient(this);
     }
 

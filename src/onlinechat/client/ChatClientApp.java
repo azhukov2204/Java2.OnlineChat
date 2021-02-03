@@ -1,6 +1,5 @@
 package onlinechat.client;
 
-import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import onlinechat.client.controllers.AuthWindowController;
 import onlinechat.client.controllers.MainChatWindowController;
@@ -12,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.ConnectException;
 
 public class ChatClientApp extends Application {
 

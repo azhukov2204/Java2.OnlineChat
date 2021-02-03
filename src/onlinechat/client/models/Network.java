@@ -28,13 +28,13 @@ public class Network {
     private static final String USERSLISTRQ_CMD_PREFIX = "/usersListRq"; // + userslist
 
 
-    private String serverHost;
-    private int serverPort;
+    private final String serverHost;
+    private final int serverPort;
     private Socket clientSocket;
     private DataInputStream in = null;
     private DataOutputStream out = null;
-    private static final ButtonType yesButton = new ButtonType("Да");
-    private static final ButtonType noButton = new ButtonType("Нет, выйти");
+    public static final ButtonType yesButton = new ButtonType("Да");
+    public static final ButtonType noButton = new ButtonType("Нет, выйти");
 
     private String nickName;
     private ChatClientApp chatClientApp;
@@ -93,21 +93,19 @@ public class Network {
                     if (!message.isBlank()) {
                         String[] partsOfMessage = message.split(";", 2);
                         switch (partsOfMessage[0]) {
-                            case CLIENT_MSG_CMD_PREFIX:
+                            case CLIENT_MSG_CMD_PREFIX -> {
                                 String[] partsOfClientMessage = message.split(";", 3);
                                 Platform.runLater(() -> mainChatWindowController.addMessage(partsOfClientMessage[2], partsOfClientMessage[1]));
-                                break;
-                            case SERVER_MSG_CMD_PREFIX:
+                            }
+                            case SERVER_MSG_CMD_PREFIX -> {
                                 String[] partsOfServerMessage = message.split(";", 2);
                                 Platform.runLater(() -> mainChatWindowController.addMessage(partsOfServerMessage[1], "Сервер"));
-                                break;
-                            case USERSLIST_CMD_PREFIX:
-                                String[] activeUsers = message.replace(USERSLIST_CMD_PREFIX+";", "").split(";");
+                            }
+                            case USERSLIST_CMD_PREFIX -> {
+                                String[] activeUsers = message.replace(USERSLIST_CMD_PREFIX + ";", "").split(";");
                                 Platform.runLater(() -> mainChatWindowController.updateUsersList(activeUsers));
-                                break;
-                            default:
-                                Platform.runLater(() -> System.out.println("!!Неизвестная ошибка сервера" + message));
-                                break;
+                            }
+                            default -> Platform.runLater(() -> System.out.println("!!Неизвестная ошибка сервера" + message));
                         }
                     }
                 } catch (IOException e) {
@@ -125,7 +123,6 @@ public class Network {
                             ioException.printStackTrace();
                         }
                     });
-
                 }
             }
             System.out.println("Receiver остановлен");
@@ -142,26 +139,20 @@ public class Network {
         }
     }
 
-    public String sendAuthCommand(String login, String password) {
-        try {
-            out.writeUTF(String.format("%s;%s;%s", AUTH_CMD_PREFIX, login, password));
-            String response = in.readUTF();
+    public String sendAuthCommand(String login, String password) throws IOException {
+        out.writeUTF(String.format("%s;%s;%s", AUTH_CMD_PREFIX, login, password));
+        String response = in.readUTF();
 
-            if (response.startsWith(AUTHOK_CMD_PREFIX)) {
-                nickName = response.split(";", 3)[1];
-                return null;
-            } else {
-                return response.split(";", 2)[1];
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return e.getMessage();
+        if (response.startsWith(AUTHOK_CMD_PREFIX)) {
+            nickName = response.split(";", 3)[1];
+            return null;
+        } else {
+            return response.split(";", 2)[1];
         }
     }
 
 
-    private Optional<ButtonType> runAlert(String alertText) {
+    public static Optional<ButtonType> runAlert(String alertText) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Отсутствует подключение");
         alert.setHeaderText("Отсутствует подключение");
