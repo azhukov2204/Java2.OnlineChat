@@ -56,15 +56,17 @@ public class MyServer {
     public synchronized void subscribeClient(ClientHandler clientHandler) throws IOException {
         System.out.println("Подключился клиент " + clientHandler.getNickName());
         activeClients.add(clientHandler);
-        broadcastMessage("Подключился клиент " + clientHandler.getNickName());
+        broadcastSystemMessage("Подключился клиент " + clientHandler.getNickName());
         printActiveClients();
+        sendActiveUsersList();
     }
 
     public void unsubscribeClient(ClientHandler clientHandler) throws IOException {
         System.out.println("Отключился клиент " + clientHandler.getNickName());
         activeClients.remove(clientHandler);
-        broadcastMessage("Отключился клиент " + clientHandler.getNickName());
+        broadcastSystemMessage("Отключился клиент " + clientHandler.getNickName());
         printActiveClients();
+        sendActiveUsersList();
     }
 
 
@@ -85,7 +87,7 @@ public class MyServer {
     }
 
     //если нет отправителя (sender), то считаем, что это серверное сообщение
-    public synchronized void broadcastMessage(String message) throws IOException {
+    public synchronized void broadcastSystemMessage(String message) throws IOException {
         broadcastMessage(null, message);
     }
 
@@ -97,6 +99,18 @@ public class MyServer {
             }
         }
         return false;
+    }
+
+    public synchronized void sendActiveUsersList() throws IOException {
+        String activeUsersList = "";
+
+        for (ClientHandler activeClient : activeClients) {
+            activeUsersList = new StringBuilder().append(activeUsersList).append(activeClient.getNickName()).append(";").toString();
+        }
+
+        for (ClientHandler activeClient : activeClients) {
+            activeClient.sendUsersList(activeUsersList);
+        }
     }
 
 }

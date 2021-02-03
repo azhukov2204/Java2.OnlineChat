@@ -24,7 +24,9 @@ public class ClientHandler {
     private static final String SERVER_MSG_CMD_PREFIX = "/serverMsg"; // + msg
     private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + msg
     private static final String END_CMD_PREFIX = "/end"; //
-    //private static final String ANY_ERROR_PREFIX = "/error"; //
+    private static final String USERSLIST_CMD_PREFIX = "/usersList"; // + userslist
+    private static final String USERSLISTRQ_CMD_PREFIX = "/usersListRq"; // + userslist
+
 
 
     public ClientHandler(MyServer myServer, Socket clientSocket, BaseAuthService baseAuthService) {
@@ -127,6 +129,12 @@ public class ClientHandler {
             out.writeUTF(String.format("%s;%s", SERVER_MSG_CMD_PREFIX, message)); //если отправитель пустой, значит это серверное сообщение
         }
     }
+
+    public void sendUsersList(String usersList) throws IOException {
+            out.writeUTF(String.format("%s;%s", USERSLIST_CMD_PREFIX, usersList));
+    }
+
+
 
     public String getNickName() {
         return nickName;

@@ -116,5 +116,10 @@ public class MainChatWindowController {
         about.show();
     }
 
+    public void updateUsersList(String[] usersList) {
+        ObservableList<String> chatUsers = FXCollections.observableArrayList(usersList);
+        chatUsersList.setItems(chatUsers);//Будем каждый раз пересоздавать список. Чтоб минимизировать ошибки в случае пропусков уведомлений
+    }
+
 
 }

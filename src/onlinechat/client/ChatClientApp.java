@@ -69,7 +69,8 @@ public class ChatClientApp extends Application {
         primaryStage.show();
         primaryStage.setTitle(network.getNickName());
         //primaryStage.setAlwaysOnTop(true);
-        network.startReceiver(mainChatWindowController);
+        network.setMainChatWindowController(mainChatWindowController);
+        network.startReceiver();
         mainChatWindowController.setNetwork(network);
     }
 

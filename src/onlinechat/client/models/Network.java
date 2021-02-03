@@ -24,6 +24,8 @@ public class Network {
     private static final String SERVER_MSG_CMD_PREFIX = "/serverMsg"; // + msg
     private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + p + msg
     private static final String END_CMD_PREFIX = "/end"; //
+    private static final String USERSLIST_CMD_PREFIX = "/usersList"; // + userslist
+    private static final String USERSLISTRQ_CMD_PREFIX = "/usersListRq"; // + userslist
 
 
     private String serverHost;
@@ -36,6 +38,7 @@ public class Network {
 
     private String nickName;
     private ChatClientApp chatClientApp;
+    private MainChatWindowController mainChatWindowController;
 
     private boolean isConnected = false;
 
@@ -51,6 +54,10 @@ public class Network {
     public Network(String serverHost, int serverPort) {
         this.serverHost = serverHost;
         this.serverPort = serverPort;
+    }
+
+    public void setMainChatWindowController(MainChatWindowController mainChatWindowController) {
+        this.mainChatWindowController = mainChatWindowController;
     }
 
     public String getNickName() {
@@ -78,7 +85,7 @@ public class Network {
 
     }
 
-    public void startReceiver(MainChatWindowController chatWindowController) {
+    public void startReceiver() {
         Thread receiver = new Thread(() -> {
             while (isConnected) {
                 try {
@@ -88,13 +95,18 @@ public class Network {
                         switch (partsOfMessage[0]) {
                             case CLIENT_MSG_CMD_PREFIX:
                                 String[] partsOfClientMessage = message.split(";", 3);
-                                Platform.runLater(() -> chatWindowController.addMessage(partsOfClientMessage[2], partsOfClientMessage[1]));
+                                Platform.runLater(() -> mainChatWindowController.addMessage(partsOfClientMessage[2], partsOfClientMessage[1]));
                                 break;
                             case SERVER_MSG_CMD_PREFIX:
                                 String[] partsOfServerMessage = message.split(";", 2);
-                                Platform.runLater(() -> chatWindowController.addMessage(partsOfServerMessage[1], "Сервер"));
+                                Platform.runLater(() -> mainChatWindowController.addMessage(partsOfServerMessage[1], "Сервер"));
+                                break;
+                            case USERSLIST_CMD_PREFIX:
+                                String[] activeUsers = message.replace(USERSLIST_CMD_PREFIX+";", "").split(";");
+                                Platform.runLater(() -> mainChatWindowController.updateUsersList(activeUsers));
+                                break;
                             default:
-                                Platform.runLater(() -> System.out.println("!!Неизвестная ошибка сервера"));
+                                Platform.runLater(() -> System.out.println("!!Неизвестная ошибка сервера" + message));
                                 break;
                         }
                     }
@@ -120,7 +132,6 @@ public class Network {
         });
         receiver.setDaemon(true);
         receiver.start();
-
     }
 
 
