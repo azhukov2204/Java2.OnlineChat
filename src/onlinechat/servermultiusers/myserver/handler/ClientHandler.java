@@ -62,16 +62,16 @@ public class ClientHandler {
             if (message.startsWith(AUTH_CMD_PREFIX)) {
                 isAuthenticationSuccessful = isAuthenticationSuccessful(message);
             } else {
-                out.writeUTF(AUTHERR_CMD_PREFIX + "Ошибка авторизации");
+                out.writeUTF(AUTHERR_CMD_PREFIX + ";Ошибка авторизации");
             }
         } while (!isAuthenticationSuccessful);
         myServer.subscribeClient(this);
     }
 
     private boolean isAuthenticationSuccessful(String message) throws IOException {
-        String[] authMessageParts = message.split("\\s+", 3);
+        String[] authMessageParts = message.split(";", 3);
         if (authMessageParts.length != 3) {
-            out.writeUTF(AUTHERR_CMD_PREFIX + " Неверная команда авторизации");
+            out.writeUTF(AUTHERR_CMD_PREFIX + ";Неверная команда авторизации");
             return false;
         }
         String login = authMessageParts[1];
@@ -81,13 +81,13 @@ public class ClientHandler {
 
         if (nickName != null) {
             if (myServer.isNickNameBusy(nickName)) {
-                out.writeUTF(AUTHERR_CMD_PREFIX + " Пользователь с таким логином уже авторизован");
+                out.writeUTF(AUTHERR_CMD_PREFIX + ";Пользователь с таким логином уже авторизован");
                 return false;
             }
-            out.writeUTF(AUTHOK_CMD_PREFIX + " " + nickName + " успешно авторизован");
+            out.writeUTF(AUTHOK_CMD_PREFIX + ";" + nickName + " успешно авторизован");
             return true;
         } else {
-            out.writeUTF(AUTHERR_CMD_PREFIX + "Введены неверные логин или пароль");
+            out.writeUTF(AUTHERR_CMD_PREFIX + ";Введены неверные логин или пароль");
             return false;
         }
     }
@@ -97,13 +97,13 @@ public class ClientHandler {
             String message = in.readUTF();
 
             if (!message.isBlank()) {
-                String[] partsOfMessage = message.split("\\s+", 2);
+                String[] partsOfMessage = message.split(";", 2);
 
                 switch (partsOfMessage[0]) {
                     case END_CMD_PREFIX:
                         return;
                     case PRIVATE_MSG_CMD_PREFIX:
-                        String[] partsOfPrivateMessages = message.split("\\s+", 3);
+                        String[] partsOfPrivateMessages = message.split(";", 3);
                         if (partsOfPrivateMessages.length!=3) {
                             sendMessage(null," Ошибка отправки приватного сообщения");
                         } else {
@@ -122,9 +122,9 @@ public class ClientHandler {
 
     public void sendMessage(String senderNickName, String message) throws IOException {
         if (senderNickName!=null) {
-            out.writeUTF(String.format("%s %s %s", CLIENT_MSG_CMD_PREFIX, senderNickName, message));
+            out.writeUTF(String.format("%s;%s;%s", CLIENT_MSG_CMD_PREFIX, senderNickName, message));
         } else {
-            out.writeUTF(String.format("%s %s", SERVER_MSG_CMD_PREFIX, message)); //если отправитель пустой, значит это серверное сообщение
+            out.writeUTF(String.format("%s;%s", SERVER_MSG_CMD_PREFIX, message)); //если отправитель пустой, значит это серверное сообщение
         }
     }
 

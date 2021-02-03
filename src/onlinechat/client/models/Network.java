@@ -84,14 +84,14 @@ public class Network {
                 try {
                     String message = in.readUTF();
                     if (!message.isBlank()) {
-                        String[] partsOfMessage = message.split("\\s+", 2);
+                        String[] partsOfMessage = message.split(";", 2);
                         switch (partsOfMessage[0]) {
                             case CLIENT_MSG_CMD_PREFIX:
-                                String[] partsOfClientMessage = message.split("\\s+", 3);
+                                String[] partsOfClientMessage = message.split(";", 3);
                                 Platform.runLater(() -> chatWindowController.addMessage(partsOfClientMessage[2], partsOfClientMessage[1]));
                                 break;
                             case SERVER_MSG_CMD_PREFIX:
-                                String[] partsOfServerMessage = message.split("\\s+", 2);
+                                String[] partsOfServerMessage = message.split(";", 2);
                                 Platform.runLater(() -> chatWindowController.addMessage(partsOfServerMessage[1], "Сервер"));
                             default:
                                 Platform.runLater(() -> System.out.println("!!Неизвестная ошибка сервера"));
@@ -133,14 +133,14 @@ public class Network {
 
     public String sendAuthCommand(String login, String password) {
         try {
-            out.writeUTF(String.format("%s %s %s", AUTH_CMD_PREFIX, login, password));
+            out.writeUTF(String.format("%s;%s;%s", AUTH_CMD_PREFIX, login, password));
             String response = in.readUTF();
 
             if (response.startsWith(AUTHOK_CMD_PREFIX)) {
-                nickName = response.split("\\s+", 3)[1];
+                nickName = response.split(";", 3)[1];
                 return null;
             } else {
-                return response.split("\\s+", 2)[1];
+                return response.split(";", 2)[1];
             }
 
         } catch (IOException e) {
