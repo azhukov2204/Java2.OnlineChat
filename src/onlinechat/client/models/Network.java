@@ -31,6 +31,8 @@ public class Network {
     private Socket clientSocket;
     private DataInputStream in = null;
     private DataOutputStream out = null;
+    private static final ButtonType yesButton = new ButtonType("Да");
+    private static final ButtonType noButton = new ButtonType("Нет, выйти");
 
     private String nickName;
     private ChatClientApp chatClientApp;
@@ -63,18 +65,10 @@ public class Network {
             isConnected = true;
             System.out.println("Соединение установлено");
         } catch (IOException e) {
+            isConnected = false;
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Не удалось установить соединение");
-            alert.setHeaderText("Не удалось установить соединение");
-            alert.setContentText("Повторить попытку подключения?");
-            ButtonType yesButton = new ButtonType("Да");
-            ButtonType noButton = new ButtonType("Нет, выйти");
-            alert.getButtonTypes().clear();
-            alert.getButtonTypes().addAll(yesButton, noButton);
 
-            Optional<ButtonType> option = alert.showAndWait();
-            if (option.get() == yesButton) {
+            if (runAlert("Повторить попытку подключения?").get() == yesButton) {
                 connection();
             } else {
                 System.exit(-1);
@@ -108,14 +102,13 @@ public class Network {
                     e.printStackTrace();
                     isConnected = false;
                     System.out.println("Соединение прервано");
-                    //todo тут сделать вызов аутентификации и алерт:
                     Platform.runLater(() -> {
                         try {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Ошибка");
-                            alert.setContentText("Отпало подключение");
-                            alert.showAndWait();
-                            chatClientApp.createAndStartAuthWindow();
+                            if (runAlert("Сеанс завершен. Повторить вход в чат? Будет запущен новый сеанс").get() == yesButton) {
+                                chatClientApp.restartChat();
+                            } else {
+                                System.exit(-1);
+                            }
                         } catch (IOException ioException) {
                             ioException.printStackTrace();
                         }
@@ -154,6 +147,17 @@ public class Network {
             e.printStackTrace();
             return e.getMessage();
         }
+    }
+
+
+    private Optional<ButtonType> runAlert(String alertText) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Отсутствует подключение");
+        alert.setHeaderText("Отсутствует подключение");
+        alert.setContentText(alertText);
+        alert.getButtonTypes().clear();
+        alert.getButtonTypes().addAll(yesButton, noButton);
+        return alert.showAndWait();
     }
 
 }

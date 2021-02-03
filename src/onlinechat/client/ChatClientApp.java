@@ -36,7 +36,7 @@ public class ChatClientApp extends Application {
         launch(args);
     }
 
-    public void createAndStartAuthWindow() throws IOException {
+    private void createAndStartAuthWindow() throws IOException {
         FXMLLoader authWindowLoader = new FXMLLoader();
         authWindowLoader.setLocation(ChatClientApp.class.getResource("views/AuthWindow.fxml"));
         Parent authWindowRoot = authWindowLoader.load();
@@ -75,7 +75,8 @@ public class ChatClientApp extends Application {
 
 
 
-    public void restartChat() {
-
+    public void restartChat() throws IOException {
+        createAndStartAuthWindow();
+        //createMainChatWindow(); //этот метод пересоздаст главное окно чата, диалоги будут стерты. Пока закомментарил. В будущем этот метод можно вызывать, если сменился логин пользователя
     }
 }
