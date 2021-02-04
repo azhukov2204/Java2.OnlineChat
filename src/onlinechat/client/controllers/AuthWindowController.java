@@ -76,4 +76,10 @@ public class AuthWindowController {
         }
     }
 
+
+    @FXML
+    void focusToPasswordField(ActionEvent event) {
+        passwordField.requestFocus();
+    }
+
 }

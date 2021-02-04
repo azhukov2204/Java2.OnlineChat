@@ -29,7 +29,6 @@ public class ClientHandler {
     private static final String USERSLIST_CMD_PREFIX = "/usersList"; // + userslist
     private static final String USERSLISTRQ_CMD_PREFIX = "/usersListRq"; // + userslist
 
-
     public ClientHandler(MyServer myServer, Socket clientSocket, BaseAuthService baseAuthService) {
         this.myServer = myServer;
         this.clientSocket = clientSocket;
