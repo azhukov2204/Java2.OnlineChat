@@ -1,7 +1,6 @@
 package onlinechat.client.models;
 
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import onlinechat.client.ChatClientApp;
 import onlinechat.client.controllers.MainChatWindowController;
 import javafx.application.Platform;
@@ -10,7 +9,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Optional;
 
 public class Network {
 
@@ -33,8 +31,6 @@ public class Network {
     private Socket clientSocket;
     private DataInputStream in = null;
     private DataOutputStream out = null;
-    public static final ButtonType yesButton = new ButtonType("Да");
-    public static final ButtonType noButton = new ButtonType("Нет, выйти");
 
     private String nickName;
     private ChatClientApp chatClientApp;
@@ -75,14 +71,13 @@ public class Network {
             isConnected = false;
             e.printStackTrace();
 
-            if (runAlert("Повторить попытку подключения?").get() == yesButton) {
+
+            if ((new MyAlert(Alert.AlertType.ERROR, "Отсутствует подключение", "Отсутствует подключение", "Повторить попытку подключения?")).showAndWait().get() == MyAlert.yesButton) {
                 connection();
             } else {
                 System.exit(-1);
             }
-
         }
-
     }
 
     public void startReceiver() {
@@ -114,7 +109,7 @@ public class Network {
                     System.out.println("Соединение прервано");
                     Platform.runLater(() -> {
                         try {
-                            if (runAlert("Сеанс завершен. Повторить вход в чат? Будет запущен новый сеанс").get() == yesButton) {
+                            if ((new MyAlert(Alert.AlertType.ERROR, "Отсутствует подключение", "Отсутствует подключение", "Сеанс завершен. Повторить вход в чат? Будет запущен новый сеанс")).showAndWait().get() == MyAlert.yesButton) {
                                 chatClientApp.restartChat();
                             } else {
                                 System.exit(-1);
@@ -158,15 +153,5 @@ public class Network {
         }
     }
 
-
-    public static Optional<ButtonType> runAlert(String alertText) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Отсутствует подключение");
-        alert.setHeaderText("Отсутствует подключение");
-        alert.setContentText(alertText);
-        alert.getButtonTypes().clear();
-        alert.getButtonTypes().addAll(yesButton, noButton);
-        return alert.showAndWait();
-    }
 
 }

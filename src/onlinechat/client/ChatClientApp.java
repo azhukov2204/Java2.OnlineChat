@@ -23,7 +23,7 @@ public class ChatClientApp extends Application {
     public void start(Stage primaryStage) throws Exception{
 
         this.primaryStage = primaryStage;
-        network = new Network();
+        network = new Network(); //todo сделать возможность подключения клиента по произвольным host:port
         createAndStartAuthWindow();
         createMainChatWindow();
 
@@ -43,7 +43,7 @@ public class ChatClientApp extends Application {
         authWindowStage.setScene(new Scene(authWindowRoot));
         authWindowStage.initModality(Modality.WINDOW_MODAL);
         authWindowStage.initOwner(primaryStage);
-        primaryStage.close();
+        primaryStage.close(); // в случае сбоя запускаем повторную аутентификацию, primaryStage в этом случае закрываем
         authWindowStage.show();
         AuthWindowController authWindowController = authWindowLoader.getController();
         authWindowController.setNetwork(network);

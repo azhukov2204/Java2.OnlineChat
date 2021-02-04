@@ -27,7 +27,7 @@ public class MyServer {
             while (true) {
                 System.out.println("Ожидаем подключения пользователя");
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Клиент подключился, переходим к созданию указателя");
+                System.out.println("Клиент подключился, создаем указатель");
                 new ClientHandler(this, clientSocket, baseAuthService).startHandler();
             }
         } catch (IOException e) {
@@ -41,6 +41,7 @@ public class MyServer {
         }
     }
 
+    //методы, которые работают с ClientHandler и могут вызываться из потоков делаем синхронными
     public synchronized boolean isNickNameBusy(String nickName) {
         for (ClientHandler activeClient : activeClients) {
             if (activeClient.getNickName().equals(nickName)) {
@@ -50,50 +51,47 @@ public class MyServer {
         return false;
     }
 
-    //методы, которые работают с ClientHandler, делаем синхронными
-
     public synchronized void subscribeClient(ClientHandler clientHandler) throws IOException {
         System.out.println("Подключился клиент " + clientHandler.getNickName());
         activeClients.add(clientHandler);
-        broadcastSystemMessage("Подключился клиент " + clientHandler.getNickName());
+        sendBroadcastSystemMessage("Подключился клиент " + clientHandler.getNickName());
         printActiveClients();
-        sendActiveUsersList();
+        sendActiveUsersList(); //отправляем всем клиентам актуальный список подключенных логинов
     }
 
-    public void unsubscribeClient(ClientHandler clientHandler) throws IOException {
+    public synchronized void unsubscribeClient(ClientHandler clientHandler) throws IOException {
         System.out.println("Отключился клиент " + clientHandler.getNickName());
         activeClients.remove(clientHandler);
-        broadcastSystemMessage("Отключился клиент " + clientHandler.getNickName());
+        sendBroadcastSystemMessage("Отключился клиент " + clientHandler.getNickName());
         printActiveClients();
-        sendActiveUsersList();
+        sendActiveUsersList(); //отправляем всем клиентам актуальный список подключенных логинов
     }
 
 
-    public synchronized void printActiveClients() {
+    private synchronized void printActiveClients() {
         System.out.println("Список активных клиентов:");
         for (ClientHandler activeClient : activeClients) {
             System.out.println(activeClient.getNickName());
         }
     }
 
-    public synchronized void broadcastMessage(String senderNickName, String message) throws IOException {
+    public synchronized void sendBroadcastUserMessage(String senderNickName, String message) throws IOException {
         for (ClientHandler activeClient : activeClients) {
             if (activeClient.getNickName().equals(senderNickName)) {
-                continue;
+                continue;   //самому себе не отправляем, т.к. такое сообщение пишется локально
             }
-            activeClient.sendMessage(senderNickName, message);
+            activeClient.sendMessageToClient(senderNickName, message);
         }
     }
 
-    //если нет отправителя (sender), то считаем, что это серверное сообщение
-    public synchronized void broadcastSystemMessage(String message) throws IOException {
-        broadcastMessage(null, message);
+    public synchronized void sendBroadcastSystemMessage(String message) throws IOException {
+        sendBroadcastUserMessage(null, message);
     }
 
-    public synchronized boolean privateMessage(String senderNickName, String recipientNickName, String message) throws IOException {
+    public synchronized boolean sendPrivateUserMessage(String senderNickName, String recipientNickName, String message) throws IOException {
         for (ClientHandler activeClient : activeClients) {
             if (activeClient.getNickName().equals(recipientNickName)) {
-                activeClient.sendMessage(senderNickName, "Приватное сообщение: " + message);
+                activeClient.sendMessageToClient(senderNickName, message);
                 return true;
             }
         }
@@ -101,14 +99,13 @@ public class MyServer {
     }
 
     public synchronized void sendActiveUsersList() throws IOException {
-        String activeUsersList = "";
+        StringBuilder activeUsersList = new StringBuilder();
 
         for (ClientHandler activeClient : activeClients) {
-            activeUsersList = new StringBuilder().append(activeUsersList).append(activeClient.getNickName()).append(";").toString();
+            activeUsersList.append(activeClient.getNickName()).append(";");
         }
-
         for (ClientHandler activeClient : activeClients) {
-            activeClient.sendUsersList(activeUsersList);
+            activeClient.sendUsersListToClient(activeUsersList.toString());
         }
     }
 

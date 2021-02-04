@@ -17,7 +17,7 @@ public class ClientHandler {
 
     private String nickName;
 
-    private static final int SOCKET_TIMEOUT_MS=120000;
+    private static final int SOCKET_TIMEOUT_MS = 120000; //тайм-аут 2 минуты. Если клиент не проявляет активность во время аутентификации в течении этого времени - сокет закрывается
 
     private static final String AUTH_CMD_PREFIX = "/auth"; // + login + pass
     private static final String AUTHOK_CMD_PREFIX = "/authok"; // + username
@@ -28,7 +28,6 @@ public class ClientHandler {
     private static final String END_CMD_PREFIX = "/end"; //
     private static final String USERSLIST_CMD_PREFIX = "/usersList"; // + userslist
     private static final String USERSLISTRQ_CMD_PREFIX = "/usersListRq"; // + userslist
-
 
 
     public ClientHandler(MyServer myServer, Socket clientSocket, BaseAuthService baseAuthService) {
@@ -44,7 +43,7 @@ public class ClientHandler {
         new Thread(() -> {
             try {
                 authenticationAndSubscribe();
-                readMessages();
+                startReceiver();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -60,7 +59,7 @@ public class ClientHandler {
 
     private void authenticationAndSubscribe() throws IOException {
         String message;
-        System.out.println("Устанавливаем тайм-аут сокета");
+        System.out.printf("Устанавливаем тайм-аут сокета %d мс", SOCKET_TIMEOUT_MS);
         clientSocket.setSoTimeout(SOCKET_TIMEOUT_MS);
 
         boolean isAuthenticationSuccessful = false;
@@ -73,8 +72,9 @@ public class ClientHandler {
             }
         } while (!isAuthenticationSuccessful);
 
-        clientSocket.setSoTimeout(0);   //после прохождения аутентификации снимаем ограничение по тайм-ауту
         myServer.subscribeClient(this);
+        System.out.println("Снимаем с сокета ограничение по тайм-ауту");
+        clientSocket.setSoTimeout(0);   //после прохождения аутентификации снимаем ограничение по тайм-ауту
     }
 
     private boolean isAuthenticationSuccessful(String message) throws IOException {
@@ -92,55 +92,55 @@ public class ClientHandler {
             if (myServer.isNickNameBusy(nickName)) {
                 out.writeUTF(AUTHERR_CMD_PREFIX + ";Пользователь с таким логином уже авторизован");
                 return false;
+            } else {
+                out.writeUTF(AUTHOK_CMD_PREFIX + ";" + nickName + ";успешно авторизован");
+                return true;
             }
-            out.writeUTF(AUTHOK_CMD_PREFIX + ";" + nickName + ";успешно авторизован");
-            return true;
         } else {
             out.writeUTF(AUTHERR_CMD_PREFIX + ";Введены неверные логин или пароль");
             return false;
         }
     }
 
-    private void readMessages() throws IOException {
+    private void startReceiver() throws IOException {
         while (true) {
             String message = in.readUTF();
-
             if (!message.isBlank()) {
                 String[] partsOfMessage = message.split(";", 2);
-
                 switch (partsOfMessage[0]) {
-                    case END_CMD_PREFIX:
+                    case END_CMD_PREFIX: //завершаем работу этого указателя/клиента
                         return;
                     case PRIVATE_MSG_CMD_PREFIX:
                         String[] partsOfPrivateMessages = message.split(";", 3);
-                        if (partsOfPrivateMessages.length!=3) {
-                            sendMessage(null," Ошибка отправки приватного сообщения");
+                        if (partsOfPrivateMessages.length != 3) {
+                            sendMessageToClient(null, " Ошибка отправки приватного сообщения");
                         } else {
-                            if (!myServer.privateMessage(nickName, partsOfPrivateMessages[1], partsOfPrivateMessages[2])) {
-                                sendMessage(null," Ошибка отправки приватного сообщения, получатель не подключен");
+                            String recipientNickName = partsOfPrivateMessages[1];
+                            String privateMessage = partsOfPrivateMessages[2];
+                            if (!myServer.sendPrivateUserMessage(nickName, recipientNickName, privateMessage)) { //отправляем приватное сообщение и сразу проверяем статус отпарвки
+                                sendMessageToClient(null, " Ошибка отправки приватного сообщения, получатель не подключен");
                             }
                         }
                         break;
                     default:
-                        myServer.broadcastMessage(nickName, message);
+                        myServer.sendBroadcastUserMessage(nickName, message);
                         break;
                 }
             }
         }
     }
 
-    public void sendMessage(String senderNickName, String message) throws IOException {
-        if (senderNickName!=null) {
+    public void sendMessageToClient(String senderNickName, String message) throws IOException {
+        if (senderNickName != null) {
             out.writeUTF(String.format("%s;%s;%s", CLIENT_MSG_CMD_PREFIX, senderNickName, message));
         } else {
             out.writeUTF(String.format("%s;%s", SERVER_MSG_CMD_PREFIX, message)); //если отправитель пустой, значит это серверное сообщение
         }
     }
 
-    public void sendUsersList(String usersList) throws IOException {
-            out.writeUTF(String.format("%s;%s", USERSLIST_CMD_PREFIX, usersList));
+    public void sendUsersListToClient(String usersList) throws IOException {
+        out.writeUTF(String.format("%s;%s", USERSLIST_CMD_PREFIX, usersList));
     }
-
 
 
     public String getNickName() {

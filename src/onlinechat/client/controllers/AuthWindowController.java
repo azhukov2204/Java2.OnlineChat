@@ -2,8 +2,6 @@ package onlinechat.client.controllers;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -12,6 +10,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.event.ActionEvent;
 import onlinechat.client.ChatClientApp;
+import onlinechat.client.models.MyAlert;
 import onlinechat.client.models.Network;
 
 public class AuthWindowController {
@@ -27,11 +26,6 @@ public class AuthWindowController {
         this.chatClientApp = chatClientApp;
     }
 
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
 
     @FXML
     private TextField loginField;
@@ -41,14 +35,6 @@ public class AuthWindowController {
 
     @FXML
     private Button enterButton;
-
-    @FXML
-    void initialize() {
-        assert loginField != null : "fx:id=\"loginField\" was not injected: check your FXML file 'AuthWindow.fxml'.";
-        assert passwordField != null : "fx:id=\"passwordField\" was not injected: check your FXML file 'AuthWindow.fxml'.";
-        assert enterButton != null : "fx:id=\"enterButton\" was not injected: check your FXML file 'AuthWindow.fxml'.";
-
-    }
 
 
     @FXML
@@ -75,7 +61,7 @@ public class AuthWindowController {
         if (authErrorMessage == null) {
             chatClientApp.startChat();
         } else if (authErrorMessage.equals("SocketException")) {
-            if (Network.runAlert("Повторить попытку подключения?").get() == Network.yesButton) {
+            if ((new MyAlert(Alert.AlertType.ERROR, "Отсутствует подключение", "Отсутствует подключение, возможно из-за длительного бездействия", "Повторить попытку подключения?")).showAndWait().get() == MyAlert.yesButton) {
                 network.connection();
             } else {
                 System.exit(-1);

@@ -51,9 +51,6 @@ public class MainChatWindowController {
     @FXML
     private TextField sendMessageText;
 
-
-    private String currentUser = "Иванов Иван"; //В начальной реализации это пока что фиксированное значение
-
     @FXML
     void initialize() {
         userTableField.setCellValueFactory(new PropertyValueFactory<>("user"));
@@ -70,10 +67,6 @@ public class MainChatWindowController {
             return cell;
         });
 
-        //ObservableList<String> chatUsers = FXCollections.observableArrayList("Петров Петр", "Федор Михайлович");
-        //chatUsersList.setItems(chatUsers); //добавим несколько записей в поле с активными пользователями чата, для теста
-        //chatUsersList.getItems().add(currentUser); //Добавляем "текущего" пользователя. Пока только для теста
-        chatUsersList.setItems(FXCollections.observableArrayList(List.of("Мартин_Некотов", "Борис_Николаевич", "Гендальф_Серый")));
         chatUsersList.setCellFactory(lv -> {
             MultipleSelectionModel<String> selectionModel = chatUsersList.getSelectionModel();
             ListCell<String> cell = new ListCell<>();
@@ -108,7 +101,7 @@ public class MainChatWindowController {
                 if (selectedNickName.isBlank()) {
                     network.sendMessage(message, this);
                 } else {
-                    network.sendPrivateMessage(selectedNickName, message);
+                    network.sendPrivateMessage(selectedNickName, String.format("Приватное сообщение для %s: %s", selectedNickName, message));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
