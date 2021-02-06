@@ -1,5 +1,6 @@
 package onlinechat.client.controllers;
 
+import javafx.scene.input.MouseEvent;
 import onlinechat.client.controllers.types.RowChatMessage;
 import onlinechat.client.models.Network;
 import javafx.collections.FXCollections;
@@ -12,11 +13,17 @@ import javafx.scene.text.Text;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 public class MainChatWindowController {
 
     private Network network;
+
+    private String selectedNickName = "";
+
+    @FXML
+    private Label selectedNickNameLabel;
 
     public void setNetwork(Network network) {
         this.network = network;
@@ -44,9 +51,6 @@ public class MainChatWindowController {
     @FXML
     private TextField sendMessageText;
 
-
-    private String currentUser = "Иванов Иван"; //В начальной реализации это пока что фиксированное значение
-
     @FXML
     void initialize() {
         userTableField.setCellValueFactory(new PropertyValueFactory<>("user"));
@@ -63,20 +67,42 @@ public class MainChatWindowController {
             return cell;
         });
 
-        ObservableList<String> chatUsers = FXCollections.observableArrayList("Петров Петр", "Федор Михайлович");
-        chatUsersList.setItems(chatUsers); //добавим несколько записей в поле с активными пользователями чата, для теста
-        chatUsersList.getItems().add(currentUser); //Добавляем "текущего" пользователя. Пока только для теста
-
+        chatUsersList.setCellFactory(lv -> {
+            MultipleSelectionModel<String> selectionModel = chatUsersList.getSelectionModel();
+            ListCell<String> cell = new ListCell<>();
+            cell.textProperty().bind(cell.itemProperty());
+            cell.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                chatUsersList.requestFocus();
+                if (!cell.isEmpty()) {
+                    int index = cell.getIndex();
+                    if (selectionModel.getSelectedIndices().contains(index)) {
+                        selectionModel.clearSelection(index);
+                        selectedNickName = "";
+                        selectedNickNameLabel.setText("Сообщение для всех пользователей чата: ");
+                    } else {
+                        selectionModel.select(index);
+                        selectedNickName = cell.getItem();
+                        selectedNickNameLabel.setText("Приватное сообщение для " + selectedNickName + ":");
+                    }
+                    event.consume();
+                }
+            });
+            return cell;
+        });
     }
 
 
     @FXML
     void sendMessage() {
         sendMessageText.requestFocus(); //при вызове метода фокус сразу возвращается на sendMessageText
-        String message=sendMessageText.getText().trim(); //введенное сообщение
+        String message = sendMessageText.getText().trim(); //введенное сообщение
         if (!message.isBlank()) { //если что-то введено, то добавляем сообщение
             try {
-                network.sendMessage(message, "Я", this);
+                if (selectedNickName.isBlank()) {
+                    network.sendMessage(message, this);
+                } else {
+                    network.sendPrivateMessage(selectedNickName, String.format("Приватное сообщение для %s: %s", selectedNickName, message));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -86,12 +112,12 @@ public class MainChatWindowController {
     }
 
     public void addMessage(String message, String nickName) {
-            Date date = new Date(); //текущая дата и время
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-            String currentTime = timeFormat.format(date); //Преобразуем время в нужный формат
-            chatMessagesTable.getItems().add(new RowChatMessage(currentTime, nickName, message));
-            int messagesCount = chatMessagesTable.getItems().size();
-            chatMessagesTable.scrollTo(messagesCount -1 ); //прокрутим к последнему сообшению
+        Date date = new Date(); //текущая дата и время
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        String currentTime = timeFormat.format(date); //Преобразуем время в нужный формат
+        chatMessagesTable.getItems().add(new RowChatMessage(currentTime, nickName, message));
+        int messagesCount = chatMessagesTable.getItems().size();
+        chatMessagesTable.scrollTo(messagesCount - 1); //прокрутим к последнему сообшению
     }
 
 
@@ -113,6 +139,11 @@ public class MainChatWindowController {
         about.setHeaderText("Online - чат");
         about.setContentText("Курс Java Core. Продвинутый уровень.");
         about.show();
+    }
+
+    public void updateUsersList(String[] usersList) {
+        ObservableList<String> chatUsers = FXCollections.observableArrayList(usersList);
+        chatUsersList.setItems(chatUsers);//Будем каждый раз пересоздавать список. Чтоб минимизировать ошибки в случае пропусков уведомлений
     }
 
 

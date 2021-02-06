@@ -31,11 +31,11 @@ public class BaseAuthService implements AuthService {
 
     private List<User> users;
 
-    //При создании объекта происходит инициализация списка учетных записей
+    //При создании объекта происходит инициализация списка учетных записей, пока хардкод
     public BaseAuthService() {
         users = List.of(
-                new User("boris", "123456", "Боря"),
-                new User("andrey", "654321", "Андрей"),
+                new User("boris", "111111", "Боря"),
+                new User("andrey", "111111", "Андрей"),
                 new User("ivan", "111111", "Ваня")
         );
     }
